@@ -21,7 +21,7 @@ submission. TextLens provides a simple, self-hostable tool that gives you:
 
 ## Repo Structure
 ```
-ai-text-checker/
+textlens/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py          # FastAPI app + routes
