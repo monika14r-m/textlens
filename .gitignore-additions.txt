@@ -1,0 +1,8 @@
+# Append these to the root .gitignore if not already present:
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
