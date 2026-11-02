@@ -20,8 +20,13 @@ def compute_similarity(text_a: str, text_b: str) -> float:
     if not text_a.strip() or not text_b.strip():
         return 0.0
 
-    vectorizer = TfidfVectorizer().fit([text_a, text_b])
-    vectors = vectorizer.transform([text_a, text_b])
+    try:
+        vectorizer = TfidfVectorizer()
+        vectors = vectorizer.fit_transform([text_a, text_b])
+    except ValueError:
+        # Punctuation-only text has no usable TF-IDF terms.
+        return 0.0
+
     score = cosine_similarity(vectors[0], vectors[1])[0][0]
     return round(float(score) * 100, 1)
 

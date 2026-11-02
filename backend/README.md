@@ -1,59 +1,40 @@
 # TextLens Backend
 
-FastAPI service providing AI-text detection and similarity/plagiarism checks.
+FastAPI service for document extraction, experimental writing-pattern analysis, pairwise text comparison, and optional AI-assisted revision.
 
 ## Setup
 
-```bash
+```powershell
 cd backend
-python -m venv venv
-source venv/bin/activate
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-## Run
-
-```bash
+Copy-Item .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-API docs available at `http://localhost:8000/docs`.
+On macOS/Linux, activate with `source .venv/bin/activate` and copy `.env.example` to `.env`.
+
+## Configuration
+
+- `TEXTLENS_CORS_ORIGINS`: comma-separated frontend origins. Use exact production origins.
+- `OPENAI_API_KEY`: optional; enables `POST /writing/revise`.
+- `OPENAI_MODEL`: optional; defaults to `gpt-4o-mini`.
+- `OPENAI_BASE_URL`: optional OpenAI-compatible API base URL.
+
+Keep keys in backend environment variables; do not expose them through Next.js public variables.
 
 ## Endpoints
 
-### `POST /analyze/ai`
-Request:
-```json
-{ "text": "Your text here..." }
-```
-Response:
-```json
-{
-  "ai_likelihood": 72.3,
-  "avg_perplexity": 18.4,
-  "burstiness": 6.2,
-  "sentence_scores": [12.1, 20.5, ...],
-  "sentences": ["Sentence one.", "Sentence two."]
-}
-```
+- `GET /` and `GET /health` — health checks.
+- `POST /documents/extract` — PDF, DOCX, TXT, MD extraction (15 MB maximum).
+- `POST /analyze/ai` — experimental writing-pattern signals; at least 100 words.
+- `POST /analyze/similarity` — compares two supplied texts only.
+- `POST /writing/revise` — optional AI editing; requires a server-side API key.
 
-### `POST /analyze/similarity`
-Request:
-```json
-{ "text_a": "...", "text_b": "..." }
-```
-Response:
-```json
-{
-  "similarity_score": 64.5,
-  "overlaps": [
-    { "text": "the quick brown fox jumps over", "start_a": 3, "start_b": 10 }
-  ]
-}
-```
+Swagger docs: `http://localhost:8000/docs`.
 
-## Notes
-- First request will download the GPT-2 model (~500MB) — this can be slow
-  on free-tier hosting. Consider using `distilgpt2` for faster cold starts.
-- Perplexity-based AI detection is a heuristic, not a definitive classifier.
-  Present results as estimates.
+## Tests
+
+Install test dependencies with `pip install -r requirements-dev.txt`, then run `pytest -q`.

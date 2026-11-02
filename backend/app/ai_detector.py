@@ -289,11 +289,8 @@ def analyze_text(text: str, config: ScoringConfig = DEFAULT_CONFIG) -> dict:
     )
     ai_likelihood = round(max(0.0, min(100.0, ai_likelihood)), 1)
  
-    confidence = round(min(100.0, word_count / 5), 1)
- 
     return {
         "ai_likelihood": ai_likelihood,
-        "confidence": confidence,
         "word_count": word_count,
         "avg_perplexity": round(avg_perplexity, 2),
         "document_perplexity": round(doc_perplexity, 2),
@@ -306,7 +303,7 @@ def analyze_text(text: str, config: ScoringConfig = DEFAULT_CONFIG) -> dict:
         ],
         "sentences": sentences,
         "warning": (
-            "AI detection is probabilistic and should not "
+            "This unvalidated heuristic is not a calibrated probability and should not "
             "be treated as proof of AI or human authorship."
         ),
     }
