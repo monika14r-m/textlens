@@ -148,8 +148,8 @@ export default function Home() {
 
         <div className="workspace-card">
           <div className="mode-tabs" role="tablist" aria-label="Analysis mode">
-            <button role="tab" aria-selected={mode === "review"} className={mode === "review" ? "mode-tab active" : "mode-tab"} onClick={() => { setMode("review"); setError(null); }}><span className="tab-icon">◉</span> Writing review</button>
-            <button role="tab" aria-selected={mode === "compare"} className={mode === "compare" ? "mode-tab active" : "mode-tab"} onClick={() => { setMode("compare"); setError(null); }}><span className="tab-icon">≋</span> Compare texts</button>
+            <button role="tab" aria-selected={mode === "review"} className={mode === "review" ? "mode-tab active" : "mode-tab"} onClick={() => { setMode("review"); setError(null); setAIResult(null); setSimilarityResult(null); }}><span className="tab-icon">◉</span> Writing review</button>
+            <button role="tab" aria-selected={mode === "compare"} className={mode === "compare" ? "mode-tab active" : "mode-tab"} onClick={() => { setMode("compare"); setError(null); setAIResult(null); setSimilarityResult(null); }}><span className="tab-icon">≋</span> Compare texts</button>
           </div>
 
           <div className="upload-grid">
@@ -159,16 +159,16 @@ export default function Home() {
                 <input id="main-file" className="sr-only" type="file" accept=".pdf,.docx,.txt,.md" onChange={(e: ChangeEvent<HTMLInputElement>) => void readFile(e.target.files?.[0])} />
                 <label htmlFor="main-file" className="upload-prompt"><span className="upload-icon"><FileIcon /></span><span className="upload-title">{extracting ? "Reading document…" : "Drop your file here"}</span><span className="upload-subtitle">or <u>browse files</u></span><span className="file-types">PDF · DOCX · TXT · MD <b>·</b> Up to 15 MB</span></label>
               </div>
-              {fileName && <div className="file-chip"><span className="file-chip-icon">↳</span><span className="file-chip-name">{fileName}</span><button aria-label="Remove uploaded file" onClick={() => { setFileName(""); setTextA(""); setAIResult(null); setSimilarityResult(null); setEditedText(""); }}>×</button></div>}
-              <textarea id="main-text" className="document-textarea" value={textA} onChange={(e) => { setTextA(e.target.value); setFileName(""); }} placeholder="Or paste your project text here…" spellCheck />
+              {fileName && <div className="file-chip"><span className="file-chip-icon">↳</span><span className="file-chip-name">{fileName}</span><button aria-label="Remove uploaded file" onClick={() => { setFileName(""); setTextA(""); setAIResult(null); setSimilarityResult(null); setEditedText(""); setRevisionNotes(""); setRevisionError(null); }}>×</button></div>}
+              <textarea id="main-text" className="document-textarea" value={textA} onChange={(e) => { setTextA(e.target.value); setFileName(""); setAIResult(null); setSimilarityResult(null); setEditedText(""); setRevisionNotes(""); setRevisionError(null); }} placeholder="Or paste your project text here…" spellCheck />
               <div className="editor-footer"><span>Text is sent to the configured server when you run a check.</span><button className="text-button" onClick={() => { setTextA(""); setFileName(""); setAIResult(null); setSimilarityResult(null); setEditedText(""); setRevisionNotes(""); setError(null); }}>Clear text</button></div>
             </div>
 
             {mode === "compare" ? (
               <div className="compare-column">
                 <div className="field-heading"><label htmlFor="compare-text">Text to compare against</label><span>{textB.trim() ? textB.trim().split(/\s+/).length.toLocaleString() : 0} words</span></div>
-                <textarea id="compare-text" className="compare-textarea" value={textB} onChange={(e) => setTextB(e.target.value)} placeholder="Paste the second version or document text here…" spellCheck />
-                <input className="sr-only" type="file" id="second-file" accept=".pdf,.docx,.txt,.md" onChange={(e) => { const f=e.target.files?.[0]; if(f) { void (async()=>{setExtracting(true);try{const x=await extractDocument(f);setTextB(x.text);setNotice(`Imported comparison: ${f.name}`);}catch(err){setError(err instanceof Error?err.message:"Could not read file.");}finally{setExtracting(false);}})(); } }} />
+                <textarea id="compare-text" className="compare-textarea" value={textB} onChange={(e) => { setTextB(e.target.value); setSimilarityResult(null); }} placeholder="Paste the second version or document text here…" spellCheck />
+                <input className="sr-only" type="file" id="second-file" accept=".pdf,.docx,.txt,.md" onChange={(e) => { const f=e.target.files?.[0]; if(f) { void (async()=>{setExtracting(true);try{const x=await extractDocument(f);setTextB(x.text);setSimilarityResult(null);setNotice(`Imported comparison: ${f.name}`);}catch(err){setError(err instanceof Error?err.message:"Could not read file.");}finally{setExtracting(false);}})(); } }} />
                 <label htmlFor="second-file" className="secondary-upload">＋ Upload comparison document</label>
                 <p className="compare-note">This compares the two texts you provide. It does not scan the entire internet or private academic databases.</p>
               </div>
