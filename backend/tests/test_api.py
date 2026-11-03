@@ -99,3 +99,23 @@ def test_revision_requires_server_side_api_key(monkeypatch):
         json={"text": "A short paragraph to edit.", "goal": "clarity"},
     )
     assert response.status_code == 503
+
+
+def test_extract_rejects_empty_document():
+    response = client.post(
+        "/documents/extract",
+        files={"file": ("empty.txt", b"", "text/plain")},
+    )
+    assert response.status_code == 400
+    assert "empty" in response.json()["detail"].lower()
+
+
+def test_extract_enforces_upload_size_limit():
+    from app.main import MAX_UPLOAD_BYTES
+
+    response = client.post(
+        "/documents/extract",
+        files={"file": ("oversized.txt", b"x" * (MAX_UPLOAD_BYTES + 1), "text/plain")},
+    )
+    assert response.status_code == 413
+    assert "15 MB" in response.json()["detail"]
